@@ -1,0 +1,21 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/prometheus
+prometheus_version: "2.53.0"
+prometheus_user: prometheus
+prometheus_config_dir: /etc/prometheus
+prometheus_data_dir: /var/lib/prometheus
+prometheus_listen_address: "0.0.0.0:9090"
+prometheus_retention_time: "30d"
+prometheus_scrape_interval: "15s"
+prometheus_node_exporter_port: 9100
+prometheus_alertmanager_address: ""
+
+prometheus_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+  armv7L: armv7
+
+prometheus_arch: "{{ prometheus_arch_map[ansible_facts['architecture']] }}"
+prometheus_archive: "prometheus-{{ prometheus_version }}.linux-{{ prometheus_arch}}"
+prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}"

@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ prometheus_user }}
+Group={{ prometheus_user }}
+ExecStart=/usr/local/bin/prometheus \
+  --config.file={{ prometheus_config_dir }}/prometheus.yml \
+  --storage.tsdb.path={{ prometheus_data_dir }} \
+  --storage.tsdb.retention.time={{ prometheus_retention_time }} \
+  --web.listen-address={{ prometheus_listen_address }}
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+NoNewPrivileges=yes
+ProtectHome=yes
+
+[Install]
+WantedBy=milti-user.target

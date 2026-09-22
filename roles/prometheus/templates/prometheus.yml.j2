@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+global:
+    scrape_interval: {{ prometheus_scrape_interval }}
+
+rule_files:
+    - {{ prometheus_config_dir }}/rules/*.yml
+
+{% if prometheus_alertmanager_address %}
+alerting:
+    alertmanagers:
+        - static_configs:
+            - targets: ['{{ prometheus_alertmanager_address }}']
+{% endif %}
+
+scrape_configs:
+    - job_name: prometheus
+      static_configs:
+        - targets: ['127.0.0.1:9090']
+          labels:
+            instance: '{{ inventory_hostname }}'
+
+
+    - job_name: node
+      static_configs:
+{% for host in groups['nodes'] %}
+        - targets: ['{{hostvars[host].ansible_host }}:{{ prometheus_node_exporter_port }}']
+          labels:
+            instance: '{{ host }}'
+{% endfor %}

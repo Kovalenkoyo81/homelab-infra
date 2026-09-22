@@ -4,3 +4,9 @@
   become: true
   roles:
     - node_exporter
+
+- name: Prometheus server
+  hosts: monitoring
+  become: true
+  roles:
+    - prometheus

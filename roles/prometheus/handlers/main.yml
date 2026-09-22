@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for roles/prometheus
+- name: Restart prometheus
+  ansible.builtin.systemd_service:
+    name: prometheus
+    state: restarted
+    daemon_reload: true
+
+- name: Reload prometheus
+  ansible.builtin.systemd_service:
+    name: prometheus
+    state: reloaded
