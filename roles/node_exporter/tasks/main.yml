@@ -1,0 +1,50 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/node_exporter
+- name: Create node_exporter system user
+  ansible.builtin.user:
+    name: "{{ node_exporter_user }}"
+    system: true
+    shell: /usr/bin/nologin
+    create_home: false
+
+- name: Download node_exporter archive
+  ansible.builtin.get_url:
+    url: "{{ node_exporter_url }}/{{ node_exporter_archive }}.tar.gz"
+    dest: "/tmp/{{ node_exporter_archive }}.tar.gz"
+    checksum: "sha256:{{ node_exporter_url }}/sha256sums.txt"
+    mode: "0644"
+
+- name: Unpack node_exporter archive
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ node_exporter_archive}}.tar.gz"
+    dest: /tmp
+    remote_src: true
+    creates: "/tmp/{{ node_exporter_archive }}/node_exporter"
+
+- name: Install node_exporter binary
+  ansible.builtin.copy:
+    src: "/tmp/{{ node_exporter_archive }}/node_exporter"
+    dest: /usr/local/bin/node_exporter
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart node_exporter
+
+- name: Install systemd unit
+  ansible.builtin.template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart node_exporter
+
+- name: Ensure node_exporter is enabled and running
+  ansible.builtin.systemd_service:
+    name: node_exporter
+    state: started
+    enabled: true
+    daemon_reload: true
+    

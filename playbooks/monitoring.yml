@@ -1,0 +1,6 @@
+---
+- name: Node exporter on all nodes
+  hosts: nodes
+  become: true
+  roles:
+    - node_exporter
