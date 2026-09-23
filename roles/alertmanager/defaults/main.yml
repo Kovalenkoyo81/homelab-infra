@@ -1,0 +1,21 @@
+---
+# defaults file for roles/alertmanager
+alertmanager_version: "0.27.0"
+alertmanager_user: alertmanager
+alertmanager_config_dir: /etc/alertmanager
+alertmanager_data_dir: /var/lib/alertmanager
+alertmanager_listen_address: "127.0.0.1:9093"
+alertmanager_resolve_timeout: "5m"
+
+alertmanager_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+  armv7l: armv7
+
+alertmanager_arch: "{{ alertmanager_arch_map[ansible_facts['architecture']] }}"
+alertmanager_archive: "alertmanager-{{ alertmanager_version }}.linux-{{ alertmanager_arch }}"
+alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}"
+
+alertmanager_telegram_chat_id: ""
+alertmanager_telegram_bot_token: ""
+alertmanager_telegram_api_url: "https://telegram.org"
