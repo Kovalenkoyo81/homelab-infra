@@ -1,0 +1,5 @@
+---
+alertmanager_telegram_bot_token: "{{ vault_telegram_bot_token }}"
+alertmanager_telegram_chat_id: "{{ vault_telegram_chat_id }}"
+
+prometheus_alertmanager_address: "127.0.0.1:9093"
