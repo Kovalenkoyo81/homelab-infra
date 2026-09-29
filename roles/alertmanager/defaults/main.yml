@@ -18,4 +18,4 @@ alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/
 
 alertmanager_telegram_chat_id: ""
 alertmanager_telegram_bot_token: ""
-alertmanager_telegram_api_url: "https://telegram.org"
+alertmanager_telegram_api_url: "https://api.telegram.org"

@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+groups:
+  - name: infrastructure
+    rules:
+      - alert: HostDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{% raw %}Host {{ $labels.instance }} is unreachable{% endraw %}'
+          description: '{% raw %}Job {{ $labels.job }} is down for more than 1 minute{% endraw %}'
+
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes * 100 < 15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{% raw %}Low disk space on {{ $labels.instance }}{% endraw %}'
+          description: '{% raw %}Mountpoint {{ $labels.mountpoint }} has {{ $value | printf "%.1f" }}% left{% endraw %}'
+
+      - alert: MemoryLow
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{% raw %}Low memory on {{ $labels.instance }}{% endraw %}'
+          description: '{% raw %}Available RAM is {{ $value | printf "%.1f" }}%{% endraw %}'
+
+      - alert: HighCPU
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{% raw %}High CPU load on {{ $labels.instance }}{% endraw %}'
+          description: '{% raw %}CPU load is {{ $value | printf "%.0f" }}% for more than 10 minutes{% endraw %}'
