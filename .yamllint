@@ -1,0 +1,20 @@
+---
+# Совместимо с ansible-lint: те же лимиты, что он проверяет сам
+extends: default
+
+ignore: |
+  inventory/group_vars/all/vault.yml
+
+rules:
+  line-length:
+    max: 160
+  braces:
+    max-spaces-inside: 1
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: false
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  truthy:
+    allowed-values: ["true", "false"]

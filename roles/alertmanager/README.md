@@ -1,38 +1,20 @@
-Role Name
-=========
+# alertmanager
 
-A brief description of the role goes here.
+Ставит Alertmanager с отправкой уведомлений в Telegram.
 
-Requirements
-------------
+- скачивание с проверкой sha256
+- конфиг проверяется `amtool check-config` до записи; задача под `no_log`,
+  потому что в конфиге токен бота
+- группировка по `alertname` + `instance`, повтор раз в 4 часа
+- critical-алерт подавляет warning того же хоста
+- слушает только `127.0.0.1` — наружу не торчит
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Переменные
 
-Role Variables
---------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+| Переменная                        | По умолчанию     |
+|-----------------------------------|------------------|
+| `alertmanager_version`            | `0.27.0`         |
+| `alertmanager_listen_address`     | `127.0.0.1:9093` |
+| `alertmanager_resolve_timeout`    | `5m`             |
+| `alertmanager_telegram_bot_token` | — из vault       |
+| `alertmanager_telegram_chat_id`   | — из vault       |
