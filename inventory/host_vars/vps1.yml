@@ -6,3 +6,6 @@ firewall_trusted_interfaces:
   - wg0
   - cni0
   - flannel.1
+
+# Пароль sudo для devops — в vault, свой для каждого хоста
+ansible_become_password: "{{ vault_vps1_become_password }}"

@@ -10,11 +10,15 @@ Ansible-роли для мониторинга двух серверов (VPS + 
 - **node_exporter** — на все хосты, бинарник из релизов с проверкой sha256
 - **prometheus** — сервер мониторинга, правила алертов
 - **alertmanager** — группировка, подавление, уведомления в Telegram
+- **admin_user** — пользователь `devops` с sudo по паролю, вход только по ключу,
+  root по SSH запрещён
 - **firewall** — iptables на VPS: SSH только через WireGuard, правила k3s не
   затрагиваются, откат при потере доступа
 
 ```
 playbooks/site.yml              — полная раскатка
+├── access.yml
+│   └── nodes       → admin_user
 ├── firewall.yml
 │   └── firewall    → firewall  (+ пересборка цепочек k3s при изменении)
 └── monitoring.yml
@@ -66,7 +70,9 @@ Firewall раскатывается первым, остальное стави�
 
 ## Запуск
 
-Пароль от vault — в `~/.vault_pass_homelab`, вне репозитория.
+Пароль от vault — в `~/.vault_pass_homelab`, вне репозитория. Пароли sudo
+у каждого хоста свои и лежат в vault (`ansible_become_password` в `host_vars`),
+поэтому `-K` не нужен.
 
 ```bash
 ansible-playbook playbooks/site.yml --check --diff   # посмотреть, что изменится

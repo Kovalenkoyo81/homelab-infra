@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+PasswordAuthentication no
+{% if ansible_user | default('') == 'root' %}
+# Ansible подключён под root — root пока разрешён, но только по ключу
+PermitRootLogin prohibit-password
+{% else %}
+PermitRootLogin no
+{% endif %}

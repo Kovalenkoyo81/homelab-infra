@@ -1,0 +1,12 @@
+---
+# defaults file for roles/admin_user
+admin_user_name: devops
+admin_user_groups:
+  - sudo
+
+# Публичные ключи, которым разрешён вход под admin_user_name.
+# Ключи добавляются к существующим, а не заменяют их.
+admin_user_authorized_keys: []
+
+# SHA-512 хэш пароля (для sudo). Не задан — пароль не меняется.
+# admin_user_password_hash: "{{ vault_... }}"

@@ -1,5 +1,8 @@
 ---
-# Полная раскатка. Firewall первым: дальше всё ставится уже за ним.
+# Полная раскатка. Сначала доступ, потом firewall, дальше всё за ним.
+- name: Access
+  ansible.builtin.import_playbook: access.yml
+
 - name: Firewall
   ansible.builtin.import_playbook: firewall.yml
 

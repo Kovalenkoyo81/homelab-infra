@@ -3,3 +3,8 @@ alertmanager_telegram_bot_token: "{{ vault_telegram_bot_token }}"
 alertmanager_telegram_chat_id: "{{ vault_telegram_chat_id }}"
 
 prometheus_alertmanager_address: "127.0.0.1:9093"
+
+# Публичные ключи администратора (не секрет)
+admin_user_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAESbb8E4Rn21EA8EDPAtTLBivqS8lL+9ELAj/OpDWV yuri@asus-ubuntu
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIHRozqm/5THujjEu65RsYxYfLqSiA7qCP0bCbbOEXzt ubuntu@laptop17
