@@ -1,5 +1,7 @@
 # homelab-infra
 
+[![CI](https://github.com/Kovalenkoyo81/homelab-infra/actions/workflows/ci.yml/badge.svg)](https://github.com/Kovalenkoyo81/homelab-infra/actions/workflows/ci.yml)
+
 Ansible-роли для мониторинга двух серверов (VPS + одноплатник), связанных
 через WireGuard.
 
@@ -76,10 +78,17 @@ ansible-playbook playbooks/monitoring.yml            # только монито
 
 ## Проверки
 
+Те же версии, что в CI (`requirements.txt`):
+
 ```bash
+pip install -r requirements.txt
 yamllint .
 ansible-lint
+ansible-playbook playbooks/site.yml --syntax-check
 ```
+
+CI запускает их на каждый PR и push в `main`. Vault в CI не расшифровывается:
+линтерам и `syntax-check` пароль не нужен, используется фиктивный.
 
 ## Проверено
 

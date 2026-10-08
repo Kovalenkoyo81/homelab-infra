@@ -18,3 +18,5 @@ rules:
     forbid-explicit-octal: true
   truthy:
     allowed-values: ["true", "false"]
+    # "on:" в GitHub Actions — ключ, а не булево значение
+    check-keys: false

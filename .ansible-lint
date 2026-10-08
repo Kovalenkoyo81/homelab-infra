@@ -1,0 +1,4 @@
+---
+# Зашифрован ansible-vault — правилам читать нечего
+exclude_paths:
+  - inventory/group_vars/all/vault.yml

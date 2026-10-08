@@ -1,0 +1,48 @@
+---
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: install lint tools
+        run: pip install -r requirements.txt
+
+      # ansible.cfg points to ~/.vault_pass_homelab, which does not exist here.
+      # Linters and syntax-check never decrypt vault, so any password will do.
+      - name: dummy vault password
+        run: echo "ci-dummy" > "$RUNNER_TEMP/vault_pass"
+
+      - name: yamllint
+        run: yamllint .
+
+      - name: ansible-lint
+        env:
+          ANSIBLE_VAULT_PASSWORD_FILE: ${{ runner.temp }}/vault_pass
+        run: ansible-lint
+
+      - name: syntax-check
+        env:
+          ANSIBLE_VAULT_PASSWORD_FILE: ${{ runner.temp }}/vault_pass
+        run: ansible-playbook playbooks/site.yml --syntax-check
