@@ -1,0 +1,11 @@
+---
+# Пользователь для администрирования и запрет входа под root / по паролю.
+# Первый запуск на хосте, где пока есть только root:
+#   ansible-playbook playbooks/access.yml --limit <host> -e ansible_user=root -K
+# Дальше — обычный запуск под admin_user_name.
+- name: Admin user and SSH hardening
+  hosts: nodes
+  become: true
+  serial: 1
+  roles:
+    - admin_user

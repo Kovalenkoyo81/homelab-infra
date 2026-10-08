@@ -1,0 +1,3 @@
+---
+# Пароль devops для sudo — хэш хранится в vault
+admin_user_password_hash: "{{ vault_bananapipro_devops_password_hash }}"

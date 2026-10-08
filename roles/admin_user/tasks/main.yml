@@ -1,0 +1,42 @@
+---
+# tasks file for roles/admin_user
+
+- name: Create admin user
+  ansible.builtin.user:
+    name: "{{ admin_user_name }}"
+    shell: /bin/bash
+    groups: "{{ admin_user_groups }}"
+    append: true
+    password: "{{ admin_user_password_hash | default(omit) }}"
+    update_password: always
+  no_log: true
+
+- name: Authorize SSH keys for admin user
+  ansible.posix.authorized_key:
+    user: "{{ admin_user_name }}"
+    key: "{{ item }}"
+  loop: "{{ admin_user_authorized_keys }}"
+
+# Пока Ansible подключён под root, полностью запрещать root нельзя —
+# роль отрезала бы сама себя. Тогда root остаётся только по ключу.
+- name: Install SSH hardening config
+  ansible.builtin.template:
+    src: hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/10-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Reload ssh
+
+- name: Apply SSH config before checking access
+  ansible.builtin.meta: flush_handlers
+
+# Текущее соединение уже установлено и переживёт reload.
+# Проверять нужно новое подключение.
+- name: Drop current SSH connection
+  ansible.builtin.meta: reset_connection
+
+- name: Check that a new connection works
+  ansible.builtin.wait_for_connection:
+    timeout: 30

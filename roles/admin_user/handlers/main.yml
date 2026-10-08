@@ -1,0 +1,6 @@
+---
+# handlers file for roles/admin_user
+- name: Reload ssh
+  ansible.builtin.systemd_service:
+    name: ssh
+    state: reloaded
