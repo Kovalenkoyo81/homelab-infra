@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Host firewall ({{ firewall_chain }} iptables chain)
+DefaultDependencies=no
+Wants=network-pre.target
+Before=network-pre.target shutdown.target
+After=systemd-modules-load.service local-fs.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/firewall-apply
+
+[Install]
+WantedBy=multi-user.target

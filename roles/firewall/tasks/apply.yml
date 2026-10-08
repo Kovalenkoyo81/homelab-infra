@@ -1,0 +1,49 @@
+---
+# Применение правил с откатом: если после применения нельзя подключиться
+# заново, таймер через firewall_rollback_timeout секунд снимет правила сам.
+
+- name: Remove stale rollback timer
+  ansible.builtin.systemd_service:
+    name: firewall-rollback.timer
+    state: stopped
+  failed_when: false
+
+- name: Arm rollback timer
+  ansible.builtin.command: >-
+    systemd-run --collect
+    --unit=firewall-rollback
+    --on-active={{ firewall_rollback_timeout }}
+    /usr/local/sbin/firewall-rollback
+  changed_when: true
+
+- name: Apply firewall rules
+  ansible.builtin.systemd_service:
+    name: firewall
+    state: restarted
+    daemon_reload: true
+
+# Текущая SSH-сессия уже в ESTABLISHED и переживёт любые правила.
+# Проверять нужно новое подключение — через wg0, единственный вход на хост.
+- name: Drop current SSH connection
+  ansible.builtin.meta: reset_connection
+
+- name: Check that a new connection through wg0 works
+  ansible.builtin.wait_for_connection:
+    timeout: 30
+
+- name: Disarm rollback timer
+  ansible.builtin.systemd_service:
+    name: firewall-rollback.timer
+    state: stopped
+
+# Доступ подтверждён. Теперь убедиться, что снаружи SSH действительно закрыт.
+- name: Check that SSH on public address is closed
+  ansible.builtin.wait_for:
+    host: "{{ firewall_public_address }}"
+    port: 22
+    state: stopped
+    connect_timeout: 5
+    timeout: 15
+  delegate_to: localhost
+  become: false
+  when: firewall_check_ssh_closed

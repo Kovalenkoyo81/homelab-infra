@@ -1,0 +1,65 @@
+---
+# tasks file for roles/firewall
+
+- name: Install iptables
+  ansible.builtin.apt:
+    name: iptables
+    state: present
+
+- name: Create firewall config directory
+  ansible.builtin.file:
+    path: "{{ firewall_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Install firewall rules
+  ansible.builtin.template:
+    src: rules.j2
+    dest: "{{ firewall_config_dir }}/rules.v{{ item }}"
+    owner: root
+    group: root
+    mode: "0640"
+    validate: "{{ 'ip6tables' if item == 6 else 'iptables' }}-restore --test --noflush %s"
+  loop: "{{ [4, 6] if firewall_ipv6 else [4] }}"
+  register: firewall_rules
+  notify: firewall changed
+
+- name: Install firewall scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/usr/local/sbin/{{ item }}"
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - firewall-apply
+    - firewall-rollback
+  register: firewall_scripts
+  notify: firewall changed
+
+- name: Install firewall systemd unit
+  ansible.builtin.template:
+    src: firewall.service.j2
+    dest: /etc/systemd/system/firewall.service
+    owner: root
+    group: root
+    mode: "0644"
+    validate: systemd-analyze verify %s
+  register: firewall_unit
+  notify: firewall changed
+
+- name: Apply firewall with rollback timer
+  ansible.builtin.include_tasks: apply.yml
+  when:
+    - not ansible_check_mode
+    - firewall_rules.changed or firewall_scripts.changed or firewall_unit.changed
+
+- name: Ensure firewall is enabled on boot
+  ansible.builtin.systemd_service:
+    name: firewall
+    enabled: true
+    daemon_reload: true
+  # В --check юнит ещё не записан на диск
+  ignore_errors: "{{ ansible_check_mode }}"

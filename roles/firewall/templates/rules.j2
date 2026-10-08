@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+# Загружается через ip{{ '6' if item == 6 else '' }}tables-restore --noflush:
+# меняется только своя цепочка, правила k3s не трогаются
+*filter
+:{{ firewall_chain }} - [0:0]
+-F {{ firewall_chain }}
+{% for iface in firewall_trusted_interfaces %}
+-A {{ firewall_chain }} -i {{ iface }} -j ACCEPT
+{% endfor %}
+-A {{ firewall_chain }} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A {{ firewall_chain }} -m conntrack --ctstate INVALID -j DROP
+{% if item == 6 %}
+-A {{ firewall_chain }} -p ipv6-icmp -j ACCEPT
+{% else %}
+-A {{ firewall_chain }} -p icmp -j ACCEPT
+{% endif %}
+{% for port in firewall_public_tcp_ports %}
+-A {{ firewall_chain }} -p tcp --dport {{ port }} -m conntrack --ctstate NEW -j ACCEPT
+{% endfor %}
+{% for port in firewall_public_udp_ports %}
+-A {{ firewall_chain }} -p udp --dport {{ port }} -j ACCEPT
+{% endfor %}
+-A {{ firewall_chain }} -j DROP
+COMMIT

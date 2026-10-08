@@ -1,0 +1,8 @@
+---
+# Сети k3s: под обращается к API и DNS на хосте через cni0,
+# VXLAN между нодами идёт через flannel.1
+firewall_trusted_interfaces:
+  - lo
+  - wg0
+  - cni0
+  - flannel.1

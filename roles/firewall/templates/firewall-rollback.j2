@@ -1,0 +1,10 @@
+#!/bin/sh
+# {{ ansible_managed }}
+# Запускается таймером, если после применения доступ не подтвердили.
+# Убирает переход на {{ firewall_chain }} и выключает автозагрузку правил.
+
+iptables -w -D INPUT -j {{ firewall_chain }} || true
+{% if firewall_ipv6 %}
+ip6tables -w -D INPUT -j {{ firewall_chain }} || true
+{% endif %}
+systemctl disable firewall.service || true

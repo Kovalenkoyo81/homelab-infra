@@ -1,0 +1,38 @@
+---
+- name: Firewall on public hosts
+  hosts: firewall
+  become: true
+  serial: 1
+  roles:
+    - firewall
+
+  # Роль firewall про k3s не знает — только сообщает "firewall changed".
+  # Если k3s на хосте есть, он останавливается, удаляет свои цепочки
+  # и создаёт их заново поверх FIREWALL-INPUT — так же, как при загрузке.
+  handlers:
+    - name: Check whether k3s is installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s-killall.sh
+      register: k3s_killall
+      listen: firewall changed
+
+    - name: Stop k3s and remove its iptables chains
+      ansible.builtin.command: /usr/local/bin/k3s-killall.sh
+      when: k3s_killall.stat.exists
+      changed_when: true
+      listen: firewall changed
+
+    - name: Start k3s
+      ansible.builtin.systemd_service:
+        name: k3s
+        state: started
+      when: k3s_killall.stat.exists
+      listen: firewall changed
+
+    - name: Wait for k3s node to be Ready
+      ansible.builtin.command: >-
+        k3s kubectl wait node/{{ ansible_facts['nodename'] }}
+        --for=condition=Ready --timeout=180s
+      when: k3s_killall.stat.exists
+      changed_when: false
+      listen: firewall changed

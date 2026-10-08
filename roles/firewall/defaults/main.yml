@@ -1,0 +1,24 @@
+---
+# defaults file for roles/firewall
+firewall_chain: FIREWALL-INPUT
+firewall_config_dir: /etc/firewall
+
+# Интерфейсы, с которых разрешено всё.
+# SSH снаружи закрыт — доступ к хосту только через wg0.
+firewall_trusted_interfaces:
+  - lo
+  - wg0
+
+# Порты, открытые в интернет
+firewall_public_tcp_ports: []
+firewall_public_udp_ports:
+  - 51820  # WireGuard
+
+firewall_ipv6: true
+
+# Через сколько секунд правила снимутся сами, если доступ не подтверждён
+firewall_rollback_timeout: 300
+
+# Проверить с управляющей машины, что SSH на публичном адресе закрыт
+firewall_check_ssh_closed: true
+firewall_public_address: "{{ ansible_facts['default_ipv4']['address'] }}"

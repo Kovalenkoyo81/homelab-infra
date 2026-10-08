@@ -1,0 +1,7 @@
+---
+# Полная раскатка. Firewall первым: дальше всё ставится уже за ним.
+- name: Firewall
+  ansible.builtin.import_playbook: firewall.yml
+
+- name: Monitoring
+  ansible.builtin.import_playbook: monitoring.yml

@@ -1,0 +1,12 @@
+#!/bin/sh
+# {{ ansible_managed }}
+# Загружает цепочку {{ firewall_chain }} и вставляет переход на неё в начало INPUT
+set -eu
+
+iptables-restore -w --noflush {{ firewall_config_dir }}/rules.v4
+iptables -w -C INPUT -j {{ firewall_chain }} 2>/dev/null || iptables -w -I INPUT 1 -j {{ firewall_chain }}
+{% if firewall_ipv6 %}
+
+ip6tables-restore -w --noflush {{ firewall_config_dir }}/rules.v6
+ip6tables -w -C INPUT -j {{ firewall_chain }} 2>/dev/null || ip6tables -w -I INPUT 1 -j {{ firewall_chain }}
+{% endif %}
