@@ -4,7 +4,7 @@
   ansible.builtin.user:
     name: "{{ node_exporter_user }}"
     system: true
-    shell: /usr/bin/nologin
+    shell: /usr/sbin/nologin
     create_home: false
 
 - name: Download node_exporter archive
