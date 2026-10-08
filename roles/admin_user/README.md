@@ -3,7 +3,7 @@
 Пользователь для администрирования и закрытие входа под root.
 
 - создаёт `admin_user_name` (по умолчанию `devops`) в группе `sudo`;
-  sudo — по паролю, хэш пароля хранится в vault
+  sudo — по паролю; пароль и его хэш хранятся в vault, у каждого хоста свои
 - добавляет публичные ключи из `admin_user_authorized_keys` (к существующим,
   не заменяя их — чтобы не отрезать доступ с других машин)
 - `/etc/ssh/sshd_config.d/10-hardening.conf`: вход по паролю запрещён,
@@ -20,8 +20,8 @@
 Первый запуск на хосте, где есть только root:
 
 ```bash
-ansible-playbook playbooks/access.yml --limit <host> -e ansible_user=root -K
-ansible-playbook playbooks/access.yml --limit <host> -K   # уже под devops
+ansible-playbook playbooks/access.yml --limit <host> -e ansible_user=root
+ansible-playbook playbooks/access.yml --limit <host>      # уже под devops
 ```
 
 ## Переменные

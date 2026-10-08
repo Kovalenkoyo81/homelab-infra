@@ -70,7 +70,9 @@ Firewall раскатывается первым, остальное стави�
 
 ## Запуск
 
-Пароль от vault — в `~/.vault_pass_homelab`, вне репозитория.
+Пароль от vault — в `~/.vault_pass_homelab`, вне репозитория. Пароли sudo
+у каждого хоста свои и лежат в vault (`ansible_become_password` в `host_vars`),
+поэтому `-K` не нужен.
 
 ```bash
 ansible-playbook playbooks/site.yml --check --diff   # посмотреть, что изменится

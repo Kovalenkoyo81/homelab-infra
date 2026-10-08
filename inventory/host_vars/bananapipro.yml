@@ -1,3 +1,5 @@
 ---
-# Пароль devops для sudo — хэш хранится в vault
+# У каждого хоста свой пароль sudo, все — в vault.
+# Хэш нужен модулю user, сам пароль — для become.
 admin_user_password_hash: "{{ vault_bananapipro_devops_password_hash }}"
+ansible_become_password: "{{ vault_bananapipro_become_password }}"
