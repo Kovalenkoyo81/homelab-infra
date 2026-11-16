@@ -9,3 +9,6 @@ firewall_trusted_interfaces:
 
 # Пароль sudo для devops — в vault, свой для каждого хоста
 ansible_become_password: "{{ vault_vps1_become_password }}"
+
+firewall_public_tcp_ports:
+  - 8443 # NB TG relay
